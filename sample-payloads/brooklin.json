@@ -1,0 +1,9 @@
+{
+  "location_name": "Brooklyn, NY",
+  "temperature": 91,
+  "timestamp": "1564428897",
+  "position": {
+    "lat": 40.70,
+    "lng": -73.99
+  }
+}

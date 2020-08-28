@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  unico-api
+
+  Sample SAM Template for unico-api
+
+Globals:
+  Function:
+    Runtime: python3.8
+    MemorySize: 512
+    Timeout: 25
+    Environment:
+      Variables:
+        LOCATIONS_TABLE: !Ref LocationsTable
+
+Resources:
+
+  LocationsTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: locationName
+        Type: String
+
+  WeatherEventLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist.zip
+      Handler: handlers.weather_import
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LocationsTable
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /events
+            Method: POST
+
+  WeatherQueryLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist.zip
+      Handler: handlers.weather_by_location
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref LocationsTable
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /locations
+            Method: GET
+
+Outputs:
+
+  HttpApi:
+    Description: "API base url"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"
+
+  LocationsTable:
+    Description: "DynamoDB table for locations"
+    Value: !Ref LocationsTable
+  

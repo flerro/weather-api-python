@@ -1,0 +1,9 @@
+{
+  "location_name": "Oxford, UK",
+  "temperature": 64,
+  "timestamp": "1564428898",
+  "position": {
+    "lat": 51.75,
+    "lng": -1.25
+  }
+}
