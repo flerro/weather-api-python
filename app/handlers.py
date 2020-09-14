@@ -14,9 +14,9 @@ def weather_import(event, context):
             w = WeatherEvent(**items)
             w.save()
 
-        return apigw_response(200, "")
+        return success("")
 
-    except KeyError as k:
+    except (KeyError, ValueError) as k:
         return bad_request("Invalid request, %s" % str(k))
 
     except Exception as e:
@@ -31,7 +31,7 @@ def weather_by_location(event, context):
         if not event:
             return not_found("No item for location name: %s" % location)
 
-        return apigw_response(200, event.to_json())
+        return success(event.to_json())
 
     except Exception as e:
         print(e, sys.exc_info()[0])
@@ -50,5 +50,10 @@ def not_found(msg):
     return apigw_response(404, {"message": msg})
 
 
-def apigw_response(code, payload):
-    return {"statusCode": code, "body": jsonpickle.encode(payload)}
+def success(jsonPayload):
+    return apigw_response(200, jsonPayload, encode=False)
+
+
+def apigw_response(code, payload, encode=True):
+    body = json.dumps(payload) if encode else payload
+    return {"statusCode": code, "body": body}
